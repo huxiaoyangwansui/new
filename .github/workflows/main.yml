@@ -1,0 +1,46 @@
+name: Build Windows Executable
+
+# 触发条件：推送到main分支或创建Pull Request到main分支时执行
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # 使用Windows最新版Runner
+    runs-on: windows-latest
+
+    steps:
+      # 1. 拉取仓库代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 配置Python环境（可根据项目需求调整版本，如3.9、3.10等）
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. 安装依赖（PyInstaller及项目其他依赖）
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pillow # 安装打包工具
+          # 若项目有其他依赖（如requirements.txt），添加以下行：
+          # pip install -r requirements.txt
+
+      # 4. 用PyInstaller打包（包含资源文件windows.png）
+      - name: Build executable with PyInstaller
+        run: |
+          # Windows下--add-data使用分号(;)分隔源路径和目标路径
+          # --onefile：打包为单个exe文件；--name：指定exe名称（可自定义）
+          pyinstaller --onefile --name myapp --add-data "windows.png;." main.py
+
+      # 5. 上传打包产物（dist目录下的exe文件）
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-executable
+          path: dist/myapp.exe  # 对应--name指定的文件名，若修改名称需同步此处
