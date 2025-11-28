@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller pillow # 安装打包工具
+          pip install pyinstaller pillow pynput # 安装打包工具
           # 若项目有其他依赖（如requirements.txt），添加以下行：
           # pip install -r requirements.txt
 
@@ -36,7 +36,7 @@ jobs:
         run: |
           # Windows下--add-data使用分号(;)分隔源路径和目标路径
           # --onefile：打包为单个exe文件；--name：指定exe名称（可自定义）
-          pyinstaller --onefile --name myapp --add-data "windows.png;." main.py
+          pyinstaller --onefile --name myapp --windowed --add-data "windows.png;." main.py
 
       # 5. 上传打包产物（dist目录下的exe文件）
       - name: Upload artifact
